@@ -49,7 +49,17 @@ public class Test0006 {
 		//test02_a(50, 5);
 		//test02_a(60, 6);
 
-		test02_a(100, 10);
+		//test02_a(100, 10);
+
+		//test02_a(50, 4);
+		//test02_a(50, 3); //　重い
+
+		//test02_a(20, 3);
+		//test02_a(21, 3);
+		//test02_a(22, 3);
+		//test02_a(23, 3);
+
+		test02_a(20, 2);
 	}
 
 	private static void test02_a(int tableSize, int coinSize) {
@@ -60,13 +70,13 @@ public class Test0006 {
 				table[index + c] = true;
 			}
 
-			boolean winFlag = isWin(table, coinSize);
+			boolean winFlag = isWin(table, coinSize, 0);
 
 			System.out.println(index + ", " + tableSize + " --> " + winFlag);
 		}
 	}
 
-	private static boolean isWin(boolean[] table, int coinSize) {
+	private static boolean isWin(boolean[] table, int coinSize, int depth) {
 		for (int index = 0; index + coinSize <= table.length; index++) {
 			boolean puttable = true;
 
@@ -81,13 +91,17 @@ public class Test0006 {
 				for (int c = 0; c < coinSize; c++) {
 					table[index + c] = true;
 				}
-				boolean winFlag = isWin(table, coinSize);
+				boolean winFlag = isWin(table, coinSize, depth + 1);
 				for (int c = 0; c < coinSize; c++) {
 					table[index + c] = false;
 				}
 
 				// 相手が負けるなら、こちらの勝ち
 				if (!winFlag) {
+					if (depth == 0) {
+						// 勝った場合の初手
+						System.out.println(index);
+					}
 					return true;
 				}
 			}
