@@ -106,6 +106,8 @@ public class Test0006 {
 				}
 			}
 		}
+
+		// 置く場所がない or 勝てる手が無い -> 負け
 		return false;
 	}
 }
