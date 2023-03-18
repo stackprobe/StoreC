@@ -1,13 +1,22 @@
 package mains.test20230319;
 
+import java.security.MessageDigest;
+import java.util.HashMap;
+
 public class Test0001 {
 	public static void main(String[] args) {
 		try {
 			//test01(new GameInfo(22, 2));
 			//test01(new GameInfo(33, 3));
 
-			test01(new GameInfo(10, 2));
+			//test01(new GameInfo(10, 2));
 			//test01(new GameInfo(15, 3));
+
+			test01(new GameInfo(8, 2));
+			//test01(new GameInfo(12, 3));
+
+			//test01(new GameInfo(6, 2));
+			//test01(new GameInfo(9, 3));
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -53,6 +62,26 @@ public class Test0001 {
 				}
 			}
 		}
+
+		public String getHashString() {
+			try {
+				MessageDigest md = MessageDigest.getInstance("SHA-512");
+				for (int x = 0; x < tableSize; x++) {
+					for (int y = 0; y < tableSize; y++) {
+						md.update(this.cells[x][y] ? (byte)0x01 : (byte)0x00); // HACK: updateBit
+					}
+				}
+				byte[] digest = md.digest();
+				StringBuffer buff = new StringBuffer();
+				for (byte chr : digest) {
+					buff.append(String.format("%02x", chr & 0xff));
+				}
+				return buff.toString();
+			}
+			catch (Throwable e) {
+				throw new Error(e);
+			}
+		}
 	}
 
 	private static void test01(GameInfo g) {
@@ -78,7 +107,16 @@ public class Test0001 {
 	private static int firstCoinX;
 	private static int firstCoinY;
 
+	private static HashMap<String, Boolean> winCache = new HashMap<String, Boolean>();
+
 	private static boolean isWin(GameInfo g, int depth) {
+		String gHash = g.getHashString();
+
+		Boolean winCacheValue = winCache.get(gHash);
+		if (winCacheValue != null) {
+			return winCacheValue;
+		}
+
 		for (int x = 0; x + g.coinSize <= g.tableSize; x++) {
 			for (int y = 0; y + g.coinSize <= g.tableSize; y++) {
 				if (g.isCoinPuttable(x, y)) {
@@ -92,11 +130,16 @@ public class Test0001 {
 							firstCoinX = x;
 							firstCoinY = y;
 						}
+
+						winCache.put(gHash, true);
+
 						return true;
 					}
 				}
 			}
 		}
+
+		winCache.put(gHash, false);
 
 		// コインを置けない or 勝ち筋が無い -> 自分の負け確定
 		return false;
