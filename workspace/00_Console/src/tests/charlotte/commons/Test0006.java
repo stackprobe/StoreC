@@ -38,6 +38,60 @@ public class Test0006 {
 	}
 
 	private static void test02() {
-		System.out.println("Hello, Happy World!");
+		//test02_a(4, 2);
+		//test02_a(6, 2);
+		//test02_a(8, 2);
+		//test02_a(10, 2);
+		//test02_a(12, 2);
+		//test02_a(14, 2);
+
+		//test02_a(40, 4);
+		//test02_a(50, 5);
+		//test02_a(60, 6);
+
+		test02_a(100, 10);
+	}
+
+	private static void test02_a(int tableSize, int coinSize) {
+		for (int index = 0; index + coinSize <= tableSize; index++) {
+			boolean[] table = new boolean[tableSize];
+
+			for (int c = 0; c < coinSize; c++) {
+				table[index + c] = true;
+			}
+
+			boolean winFlag = isWin(table, coinSize);
+
+			System.out.println(index + ", " + tableSize + " --> " + winFlag);
+		}
+	}
+
+	private static boolean isWin(boolean[] table, int coinSize) {
+		for (int index = 0; index + coinSize <= table.length; index++) {
+			boolean puttable = true;
+
+			for (int c = 0; c < coinSize; c++) {
+				if (table[index + c]) {
+					puttable = false;
+					break;
+				}
+			}
+
+			if (puttable) {
+				for (int c = 0; c < coinSize; c++) {
+					table[index + c] = true;
+				}
+				boolean winFlag = isWin(table, coinSize);
+				for (int c = 0; c < coinSize; c++) {
+					table[index + c] = false;
+				}
+
+				// 相手が負けるなら、こちらの勝ち
+				if (!winFlag) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
