@@ -13,19 +13,13 @@ namespace Charlotte.Commons
 
 		public class RootInfo
 		{
-			private Func<string> DirGetter;
 			private string Dir = null;
-
-			public RootInfo(Func<string> dirGetter)
-			{
-				this.DirGetter = dirGetter;
-			}
 
 			public string GetDir()
 			{
 				if (this.Dir == null)
 				{
-					string dir = this.DirGetter();
+					string dir = GetRootDir();
 
 					SCommon.DeletePath(dir);
 					SCommon.CreateDir(dir);
@@ -53,9 +47,9 @@ namespace Charlotte.Commons
 			}
 		}
 
-		public static RootInfo CreateProcessRoot()
+		private static string GetRootDir()
 		{
-			return new RootInfo(() => Path.Combine(Environment.GetEnvironmentVariable("TMP"), "{4c90ff11-7fe5-4664-a66d-62a440bb4826}_" + Process.GetCurrentProcess().Id));
+			return Path.Combine(Environment.GetEnvironmentVariable("TMP"), "{4c90ff11-7fe5-4664-a66d-62a440bb4826}_" + Process.GetCurrentProcess().Id);
 		}
 
 		private static ulong CtorCounter = 0UL;
