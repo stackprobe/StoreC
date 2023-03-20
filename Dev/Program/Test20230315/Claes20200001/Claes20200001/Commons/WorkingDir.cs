@@ -13,29 +13,31 @@ namespace Charlotte.Commons
 
 		public class RootInfo
 		{
-			private string Dir;
-			private bool Created = false;
+			private Func<string> DirGetter;
+			private string Dir = null;
 
-			public RootInfo(string dir)
+			public RootInfo(Func<string> dirGetter)
 			{
-				this.Dir = dir;
+				this.DirGetter = dirGetter;
 			}
 
 			public string GetDir()
 			{
-				if (!this.Created)
+				if (this.Dir == null)
 				{
-					SCommon.DeletePath(this.Dir);
-					SCommon.CreateDir(this.Dir);
+					string dir = this.DirGetter();
 
-					this.Created = true;
+					SCommon.DeletePath(dir);
+					SCommon.CreateDir(dir);
+
+					this.Dir = dir;
 				}
 				return this.Dir;
 			}
 
 			public void Delete()
 			{
-				if (this.Created)
+				if (this.Dir != null)
 				{
 					try
 					{
@@ -46,14 +48,14 @@ namespace Charlotte.Commons
 						ProcMain.WriteLog(e);
 					}
 
-					this.Created = false;
+					this.Dir = null;
 				}
 			}
 		}
 
 		public static RootInfo CreateProcessRoot()
 		{
-			return new RootInfo(Path.Combine(Environment.GetEnvironmentVariable("TMP"), "{4c90ff11-7fe5-4664-a66d-62a440bb4826}_" + Process.GetCurrentProcess().Id));
+			return new RootInfo(() => Path.Combine(Environment.GetEnvironmentVariable("TMP"), "{4c90ff11-7fe5-4664-a66d-62a440bb4826}_" + Process.GetCurrentProcess().Id));
 		}
 
 		private static ulong CtorCounter = 0UL;

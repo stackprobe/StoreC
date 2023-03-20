@@ -11,7 +11,26 @@ namespace Charlotte.Tests
 	{
 		public void Test01()
 		{
-			// none
+			using (WorkingDir wd = new WorkingDir())
+			{
+				Console.WriteLine(wd.MakePath());
+				Console.WriteLine(wd.MakePath());
+				Console.WriteLine(wd.MakePath());
+			}
+
+			using (WorkingDir wd = new WorkingDir())
+			{
+				Console.WriteLine(wd.MakePath());
+				Console.WriteLine(wd.MakePath());
+				Console.WriteLine(wd.MakePath());
+			}
+
+			using (WorkingDir wd = new WorkingDir())
+			{
+				Console.WriteLine(wd.MakePath());
+				Console.WriteLine(wd.MakePath());
+				Console.WriteLine(wd.MakePath());
+			}
 		}
 	}
 }

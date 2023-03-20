@@ -72,9 +72,9 @@ namespace Charlotte
 
 			foreach (string dir in Directory.GetDirectories(targetDir))
 			{
-				Console.WriteLine("< " + dir);
-
 				string tableOrderingFile = Path.Combine(dir, "table-ordering.txt");
+
+				Console.WriteLine("< " + tableOrderingFile);
 
 				if (!File.Exists(tableOrderingFile))
 					throw new Exception("no tableOrderingFile");
