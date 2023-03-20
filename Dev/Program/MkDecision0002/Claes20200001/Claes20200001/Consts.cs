@@ -7,6 +7,6 @@ namespace Charlotte
 {
 	public static class Consts
 	{
-		// none
+		public const string VALUE_NO_KEY = "項目無し";
 	}
 }

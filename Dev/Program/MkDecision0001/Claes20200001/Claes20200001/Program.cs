@@ -67,6 +67,8 @@ namespace Charlotte
 		{
 			string targetDir = SCommon.MakeFullPath(ar.NextArg());
 
+			ar.End();
+
 			if (!Directory.Exists(targetDir))
 				throw new Exception("no targetDir");
 

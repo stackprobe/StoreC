@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using Charlotte.Commons;
 using Charlotte.Tests;
+using Charlotte.Utilities;
 
 namespace Charlotte
 {
@@ -36,7 +37,7 @@ namespace Charlotte
 		{
 			// -- choose one --
 
-			Main4(new ArgsReader(new string[] { }));
+			Main4(new ArgsReader(new string[] { @"C:\temp\Input.csv", @"C:\temp\Output.csv" }));
 			//new Test0001().Test01();
 			//new Test0002().Test01();
 			//new Test0003().Test01();
@@ -63,48 +64,139 @@ namespace Charlotte
 			}
 		}
 
+		private class DecisionValueInfo
+		{
+			public string StrValue;
+			public bool[] Row;
+		}
+
+		private class DecisionInfo
+		{
+			public string Name;
+			public DecisionValueInfo[] Values;
+		}
+
 		private void Main5(ArgsReader ar)
 		{
-			string targetDir = SCommon.MakeFullPath(ar.NextArg());
+			string csvFile = SCommon.MakeFullPath(ar.NextArg());
+			string destFile = SCommon.MakeFullPath(ar.NextArg());
 
-			if (!Directory.Exists(targetDir))
-				throw new Exception("no targetDir");
+			ar.End();
 
-			foreach (string dir in Directory.GetDirectories(targetDir))
+			if (!File.Exists(csvFile))
+				throw new Exception("no csvFile");
+
+			List<string[][]> kvsList = new List<string[][]>();
+
+			using (CsvFileReader reader = new CsvFileReader(csvFile))
 			{
-				string tableOrderingFile = Path.Combine(dir, "table-ordering.txt");
+				string[] row = reader.ReadRow();
 
-				Console.WriteLine("< " + tableOrderingFile);
-
-				if (!File.Exists(tableOrderingFile))
-					throw new Exception("no tableOrderingFile");
-
-				string[] tableOrdering = File.ReadAllLines(tableOrderingFile, Encoding.ASCII);
-
-				List<string> dest = new List<string>();
-
-				foreach (string name in tableOrdering)
+				foreach (string cell in row)
 				{
-					string csvFile = Path.Combine(dir, name + ".csv");
-
-					Console.WriteLine("< " + csvFile);
-
-					if (!File.Exists(csvFile))
-						throw new Exception("no csvFile");
-
-					string[] csvLines = File.ReadAllLines(csvFile, Encoding.ASCII);
-
-					dest.Add("");
-					dest.Add(name);
-					dest.AddRange(csvLines);
+					kvsList.Add(JsonToKVList(JsonNode.Load(cell), "").ToArray());
 				}
-				string destFile = dir + ".csv";
+			}
 
-				Console.WriteLine("> " + destFile);
+			DecisionInfo[] decisions = SCommon
+				.Concat(kvsList)
+				.Select(v => v[0])
+				.DistinctOrderBy(SCommon.Comp)
+				.Select(v => new DecisionInfo() { Name = v })
+				.ToArray();
 
-				File.WriteAllLines(destFile, dest, Encoding.ASCII);
+			foreach (DecisionInfo decision in decisions)
+			{
+				List<string> values = SCommon
+					.Concat(kvsList)
+					.Where(v => v[0] == decision.Name)
+					.Select(v => v[1])
+					.DistinctOrderBy(SCommon.Comp)
+					.ToList();
 
-				Console.WriteLine("done");
+				if (kvsList.Any(v => !v.Any(w => w[0] == decision.Name))) // HACK
+				{
+					values.Add(Consts.VALUE_NO_KEY);
+				}
+
+				decision.Values = values
+					.Select(v => new DecisionValueInfo() { StrValue = v, Row = new bool[kvsList.Count] })
+					.ToArray();
+			}
+			for (int index = 0; index < kvsList.Count; index++)
+			{
+				string[][] kvs = kvsList[index];
+
+				foreach (DecisionInfo decision in decisions)
+				{
+					foreach (DecisionValueInfo decisionValue in decision.Values)
+					{
+						decisionValue.Row[index] =
+							decisionValue.StrValue == Consts.VALUE_NO_KEY ?
+							!kvs.Any(v => v[0] == decision.Name) :
+							kvs.Any(v => v[0] == decision.Name && v[1] == decisionValue.StrValue);
+					}
+				}
+			}
+
+			using (CsvFileWriter writer = new CsvFileWriter(destFile))
+			{
+				foreach (DecisionInfo decision in decisions)
+				{
+					writer.WriteCell(decision.Name);
+					writer.EndRow();
+
+					foreach (DecisionValueInfo decisionValue in decision.Values)
+					{
+						writer.WriteCell("");
+						writer.WriteCell(decisionValue.StrValue);
+
+						foreach (bool flag in decisionValue.Row)
+							writer.WriteCell(flag ? "○" : "");
+
+						writer.EndRow();
+					}
+				}
+			}
+		}
+
+		private IEnumerable<string[]> JsonToKVList(JsonNode root, string nameParent)
+		{
+			if (root.Map == null)
+				throw new Exception("not Map (root element and array elements must be Map)");
+
+			foreach (JsonNode.Pair pair in root.Map)
+			{
+				string name = nameParent + "/" + pair.Name;
+				JsonNode value = pair.Value;
+
+				if (value.Array != null)
+				{
+					yield return new string[] { name, "List" };
+
+					foreach (JsonNode element in value.Array)
+						foreach (var relay in JsonToKVList(element, name))
+							yield return relay;
+				}
+				else if (value.Map != null)
+				{
+					yield return new string[] { name, "Map" };
+
+					foreach (var relay in JsonToKVList(value, name))
+						yield return relay;
+				}
+				else if (value.StringValue != null)
+				{
+					yield return new string[] { name, value.StringValue };
+				}
+				else if (value.WordValue != null)
+				{
+					yield return new string[] { name, value.WordValue };
+				}
+				else
+				{
+					throw null; // never
+				}
 			}
 		}
 	}
