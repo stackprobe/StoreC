@@ -19,51 +19,6 @@ namespace Charlotte
 			ProcMain.CUIMain(new Program().Main2);
 		}
 
-		// 以下様式統一のため用途別に好きな方を使ってね -- ★要削除
-
-#if true // 主にデバッガで実行するテスト用プログラム -- ★不要なら要削除
-		private void Main2(ArgsReader ar)
-		{
-			if (ProcMain.DEBUG)
-			{
-				Main3();
-			}
-			else
-			{
-				Main4();
-			}
-			SCommon.OpenOutputDirIfCreated();
-		}
-
-		private void Main3()
-		{
-			Main4();
-			SCommon.Pause();
-		}
-
-		private void Main4()
-		{
-			try
-			{
-				Main5();
-			}
-			catch (Exception ex)
-			{
-				ProcMain.WriteLog(ex);
-			}
-		}
-
-		private void Main5()
-		{
-			// -- choose one --
-
-			new Test0001().Test01();
-			//new Test0002().Test01();
-			//new Test0003().Test01();
-
-			// --
-		}
-#else // 主に実行ファイルにして使う/コマンド引数有り -- ★不要なら要削除
 		private void Main2(ArgsReader ar)
 		{
 			if (ProcMain.DEBUG)
@@ -110,8 +65,47 @@ namespace Charlotte
 
 		private void Main5(ArgsReader ar)
 		{
-			// TODO
+			string targetDir = SCommon.MakeFullPath(ar.NextArg());
+
+			if (!Directory.Exists(targetDir))
+				throw new Exception("no targetDir");
+
+			foreach (string dir in Directory.GetDirectories(targetDir))
+			{
+				Console.WriteLine("< " + dir);
+
+				string tableOrderingFile = Path.Combine(dir, "table-ordering.txt");
+
+				if (!File.Exists(tableOrderingFile))
+					throw new Exception("no tableOrderingFile");
+
+				string[] tableOrdering = File.ReadAllLines(tableOrderingFile, Encoding.ASCII);
+
+				List<string> dest = new List<string>();
+
+				foreach (string name in tableOrdering)
+				{
+					string csvFile = Path.Combine(dir, name + ".csv");
+
+					Console.WriteLine("< " + csvFile);
+
+					if (!File.Exists(csvFile))
+						throw new Exception("no csvFile");
+
+					string[] csvLines = File.ReadAllLines(csvFile, Encoding.ASCII);
+
+					dest.Add("");
+					dest.Add(name);
+					dest.AddRange(csvLines);
+				}
+				string destFile = dir + ".csv";
+
+				Console.WriteLine("> " + destFile);
+
+				File.WriteAllLines(destFile, dest, Encoding.ASCII);
+
+				Console.WriteLine("done");
+			}
 		}
-#endif
 	}
 }
