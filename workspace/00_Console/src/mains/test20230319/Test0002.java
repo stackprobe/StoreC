@@ -54,9 +54,9 @@ public class Test0002 {
 	}
 
 	private static void test02(GameInfo g) {
-		int xyMax = (g.tableSize - g.coinSize) / 2; // コインを中央に置くときの座標と同じはず..
+		int iMax = (g.tableSize - g.coinSize) / 2; // コインを中央に置くときの座標と同じはず..
 
-		for (int i = 0; i <= xyMax; i++) {
+		for (int i = 0; i <= iMax; i++) {
 			g.putCoin(i);
 
 			System.out.print(String.format("%d, %d, %d ", g.tableSize, g.coinSize, i));
