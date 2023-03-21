@@ -32,18 +32,18 @@ function* <generatorForTask> GameMain()
 			SetColor(BACK_COLOR);
 			PrintRect(0, 0, Screen_W, Screen_H);
 			Draw(P_Face_01, Screen_W / 2, 400, 1.0, 0.0, 1.0);
-			Draw(P_Chinko,  Screen_W / 2, 400, 1.0, 0.0, 1.0);
+			Draw(P_Wiener,  Screen_W / 2, 400, 1.0, 0.0, 1.0);
 
 			yield 1;
 		}
 		FreezeInput();
 
 		{
-			// ‚¿‚ñ‚±ˆÊ’u
-			var<double> chinkoX = Screen_W / 2;
-			var<double> chinkoY = 400;
+			// WienerˆÊ’u
+			var<double> wienerX = Screen_W / 2;
+			var<double> wienerY = 400;
 
-			// ‚¿‚ñ‚±‰ñ“]²			
+			// Wiener‰ñ“]²			
 			var<double> rotCtrX = 0.0;
 			var<double> rotCtrY = 400.0;
 
@@ -64,21 +64,21 @@ function* <generatorForTask> GameMain()
 
 				rot = getNextRot();
 
-				var<double> rx = chinkoX - rotCtrX; // ‚¿‚ñ‚±‘Š‘Î(‰ñ“]²Ë•`‰æˆÊ’u)_X
-				var<double> ry = chinkoY - rotCtrY; // ‚¿‚ñ‚±‘Š‘Î(‰ñ“]²Ë•`‰æˆÊ’u)_Y
+				var<double> rx = wienerX - rotCtrX; // Wiener‘Š‘Î(‰ñ“]²Ë•`‰æˆÊ’u)_X
+				var<double> ry = wienerY - rotCtrY; // Wiener‘Š‘Î(‰ñ“]²Ë•`‰æˆÊ’u)_Y
 				var<double> r = GetAngle(rx, ry);
 				var<double> d = GetDistance(rx, ry);
 
-				r += rot; // ‚¿‚ñ‚±‰ñ“]“K—p
+				r += rot; // Wiener‰ñ“]“K—p
 
-				var<D2Point_t> rPt = AngleToPoint(r, d); // ‰ñ“]‚ğ“K—p‚µ‚½‚¿‚ñ‚±•`‰æ‘Š‘ÎˆÊ’u
+				var<D2Point_t> rPt = AngleToPoint(r, d); // ‰ñ“]‚ğ“K—p‚µ‚½Wiener•`‰æ‘Š‘ÎˆÊ’u
 				rx = rPt.X;
 				ry = rPt.Y;
 
-				var<double> x = rotCtrX + rx; // ‚¿‚ñ‚±•`‰æˆÊ’u_X
-				var<double> y = rotCtrY + ry; // ‚¿‚ñ‚±•`‰æˆÊ’u_Y
+				var<double> x = rotCtrX + rx; // Wiener•`‰æˆÊ’u_X
+				var<double> y = rotCtrY + ry; // Wiener•`‰æˆÊ’u_Y
 
-				Draw(P_Chinko, x, y, 1.0, rot, 1.0);
+				Draw(P_Wiener, x, y, 1.0, rot, 1.0);
 
 				yield 1;
 			}
@@ -106,7 +106,7 @@ function* <generatorForTask> GameMain()
 				Draw(P_Face_01, f1x, f1y, a1, 0.0, 1.0);
 				Draw(P_Face_02_Back, f2x, f2y, a2, 0.0, 1.0);
 				Draw(P_Face_02_Fore, f2x, f2y, a2, 0.0, 1.0);
-				Draw(P_Chinko, Screen_W / 2, 400, 1.0, 0.0, 1.0);
+				Draw(P_Wiener, Screen_W / 2, 400, 1.0, 0.0, 1.0);
 
 				yield 1;
 			}
@@ -132,7 +132,7 @@ function* <generatorForTask> GameMain()
 				SetColor(BACK_COLOR);
 				PrintRect(0, 0, Screen_W, Screen_H);
 				Draw(P_Face_02_Back, x, y, 1.0, 0.0, 1.0);
-				Draw(P_Chinko, Screen_W / 2, 400, 1.0, 0.0, 1.0);
+				Draw(P_Wiener, Screen_W / 2, 400, 1.0, 0.0, 1.0);
 				Draw(P_Face_02_Fore, x, y, 1.0, 0.0, 1.0);
 
 				yield 1;

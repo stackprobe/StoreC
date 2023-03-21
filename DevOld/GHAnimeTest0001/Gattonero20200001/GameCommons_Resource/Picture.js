@@ -28,4 +28,4 @@ var<Picture_t> P_TrumpJoker = @@_Load(RESOURCE_Trump__Joker_png);
 var<Picture_t> P_Face_01      = @@_Load(RESOURCE_Picture__Game__0001_png);
 var<Picture_t> P_Face_02_Back = @@_Load(RESOURCE_Picture__Game__0003_png);
 var<Picture_t> P_Face_02_Fore = @@_Load(RESOURCE_Picture__Game__0006_png);
-var<Picture_t> P_Chinko       = @@_Load(RESOURCE_Picture__Game__0002_png);
+var<Picture_t> P_Wiener       = @@_Load(RESOURCE_Picture__Game__0002_png);

@@ -10,9 +10,7 @@ namespace Charlotte.Tests
 	{
 		public void Test01()
 		{
-			// TODO
-			// TODO
-			// TODO
+			// none
 		}
 	}
 }
