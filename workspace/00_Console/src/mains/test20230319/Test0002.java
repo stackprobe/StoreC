@@ -1,7 +1,5 @@
 package mains.test20230319;
 
-import java.util.HashMap;
-
 public class Test0002 {
 	public static void main(String[] args) {
 		try {
@@ -74,8 +72,6 @@ public class Test0002 {
 	}
 
 	private static int firstCoinPos;
-
-	private static HashMap<String, Boolean> winCache = new HashMap<String, Boolean>();
 
 	private static boolean isWin(GameInfo g, int depth) {
 		for (int i = 0; i + g.coinSize <= g.tableSize; i++) {
