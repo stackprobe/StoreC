@@ -97,10 +97,10 @@ namespace Charlotte
 				.Select(x => JsonNode.Load(x))
 				.ToArray();
 
-			// collect TreePath2Map
-			//
+			TreePath2Map = SCommon.CreateDictionary<List<JsonNode>>();
+
 			foreach (JsonNode cellJson in cellJsons)
-				JsonToKVList(cellJson).ForEach(x => { }); // force execute
+				JsonToKVList(cellJson);
 
 			foreach (List<JsonNode> ms in TreePath2Map.Values)
 			{
@@ -131,10 +131,12 @@ namespace Charlotte
 				}
 			}
 
+			TreePath2Map = null;
+
 			List<string[][]> kvsList = new List<string[][]>();
 
 			foreach (JsonNode cellJson in cellJsons)
-				kvsList.Add(JsonToKVList(cellJson).ToArray());
+				kvsList.Add(JsonToKVList(cellJson));
 
 			DecisionInfo[] decisions = SCommon
 				.Concat(kvsList)
@@ -189,14 +191,19 @@ namespace Charlotte
 			}
 		}
 
-		private Dictionary<string, List<JsonNode>> TreePath2Map = SCommon.CreateDictionary<List<JsonNode>>();
+		private string[][] JsonToKVList(JsonNode root)
+		{
+			return JsonToKVList_Main(root, "").ToArray();
+		}
 
-		private IEnumerable<string[]> JsonToKVList(JsonNode root, string treePath = "")
+		private Dictionary<string, List<JsonNode>> TreePath2Map = null;
+
+		private IEnumerable<string[]> JsonToKVList_Main(JsonNode root, string treePath)
 		{
 			if (root.Map == null)
 				throw new Exception("not Map (root element and array elements must be Map)");
 
-			// add to TreePath2Map
+			if (TreePath2Map != null) // add to TreePath2Map
 			{
 				if (!TreePath2Map.ContainsKey(treePath))
 					TreePath2Map.Add(treePath, new List<JsonNode>());
@@ -215,14 +222,14 @@ namespace Charlotte
 					yield return new string[] { name, "List" };
 
 					foreach (JsonNode element in value.Array)
-						foreach (var relay in JsonToKVList(element, subTreePath))
+						foreach (var relay in JsonToKVList_Main(element, subTreePath))
 							yield return relay;
 				}
 				else if (value.Map != null)
 				{
 					yield return new string[] { name, "Map" };
 
-					foreach (var relay in JsonToKVList(value, subTreePath))
+					foreach (var relay in JsonToKVList_Main(value, subTreePath))
 						yield return relay;
 				}
 				else if (value.StringValue != null)
