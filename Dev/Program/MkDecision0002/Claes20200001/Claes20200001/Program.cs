@@ -86,41 +86,71 @@ namespace Charlotte
 			if (!File.Exists(csvFile))
 				throw new Exception("no csvFile");
 
-			List<string[][]> kvsList = new List<string[][]>();
+			string[] csvRow;
 
 			using (CsvFileReader reader = new CsvFileReader(csvFile))
 			{
-				string[] row = reader.ReadRow();
+				csvRow = reader.ReadRow();
+			}
 
-				foreach (string cell in row)
+			JsonNode[] cellJsons = csvRow
+				.Select(x => JsonNode.Load(x))
+				.ToArray();
+
+			// collect TreePath2Map
+			//
+			foreach (JsonNode cellJson in cellJsons)
+				JsonToKVList(cellJson).ForEach(x => { }); // force execute
+
+			foreach (List<JsonNode> ms in TreePath2Map.Values)
+			{
+				List<string> names = new List<string>();
+
+				foreach (JsonNode m in ms)
+					foreach (JsonNode.Pair pair in m.Map)
+						names.Add(pair.Name);
+
+				names = names.DistinctOrderBy(SCommon.Comp).ToList();
+
+				foreach (JsonNode m in ms)
 				{
-					kvsList.Add(JsonToKVList(JsonNode.Load(cell), "").ToArray());
+					foreach (string name in names)
+					{
+						if (!m.Map.Any(x => x.Name == name))
+						{
+							m.Map.Add(new JsonNode.Pair()
+							{
+								Name = name,
+								Value = new JsonNode()
+								{
+									StringValue = Consts.VALUE_NO_KEY,
+								},
+							});
+						}
+					}
 				}
 			}
 
+			List<string[][]> kvsList = new List<string[][]>();
+
+			foreach (JsonNode cellJson in cellJsons)
+				kvsList.Add(JsonToKVList(cellJson).ToArray());
+
 			DecisionInfo[] decisions = SCommon
 				.Concat(kvsList)
-				.Select(v => v[0])
+				.Select(x => x[0])
 				.DistinctOrderBy(SCommon.Comp)
-				.Select(v => new DecisionInfo() { Name = v })
+				.Select(x => new DecisionInfo() { Name = x })
 				.ToArray();
 
 			foreach (DecisionInfo decision in decisions)
 			{
-				List<string> values = SCommon
+				decision.Values = SCommon
 					.Concat(kvsList)
-					.Where(v => v[0] == decision.Name)
-					.Select(v => v[1])
+					.Where(x => x[0] == decision.Name)
+					.Select(x => x[1])
 					.DistinctOrderBy(SCommon.Comp)
-					.ToList();
-
-				if (kvsList.Any(v => !v.Any(w => w[0] == decision.Name))) // HACK
-				{
-					values.Add(Consts.VALUE_NO_KEY);
-				}
-
-				decision.Values = values
-					.Select(v => new DecisionValueInfo() { StrValue = v, Row = new bool[kvsList.Count] })
+					.Select(x => new DecisionValueInfo() { StrValue = x, Row = new bool[kvsList.Count] })
 					.ToArray();
 			}
 			for (int index = 0; index < kvsList.Count; index++)
@@ -131,10 +161,9 @@ namespace Charlotte
 				{
 					foreach (DecisionValueInfo decisionValue in decision.Values)
 					{
-						decisionValue.Row[index] =
-							decisionValue.StrValue == Consts.VALUE_NO_KEY ?
-							!kvs.Any(v => v[0] == decision.Name) :
-							kvs.Any(v => v[0] == decision.Name && v[1] == decisionValue.StrValue);
+						decisionValue.Row[index] = kvs.Any(
+							v => v[0] == decision.Name && v[1] == decisionValue.StrValue
+							);
 					}
 				}
 			}
@@ -160,14 +189,25 @@ namespace Charlotte
 			}
 		}
 
-		private IEnumerable<string[]> JsonToKVList(JsonNode root, string nameParent)
+		private Dictionary<string, List<JsonNode>> TreePath2Map = SCommon.CreateDictionary<List<JsonNode>>();
+
+		private IEnumerable<string[]> JsonToKVList(JsonNode root, string treePath = "")
 		{
 			if (root.Map == null)
 				throw new Exception("not Map (root element and array elements must be Map)");
 
+			// add to TreePath2Map
+			{
+				if (!TreePath2Map.ContainsKey(treePath))
+					TreePath2Map.Add(treePath, new List<JsonNode>());
+
+				TreePath2Map[treePath].Add(root);
+			}
+
 			foreach (JsonNode.Pair pair in root.Map)
 			{
-				string name = nameParent + "/" + pair.Name;
+				string name = treePath + pair.Name;
+				string subTreePath = name + "/";
 				JsonNode value = pair.Value;
 
 				if (value.Array != null)
@@ -175,14 +215,14 @@ namespace Charlotte
 					yield return new string[] { name, "List" };
 
 					foreach (JsonNode element in value.Array)
-						foreach (var relay in JsonToKVList(element, name))
+						foreach (var relay in JsonToKVList(element, subTreePath))
 							yield return relay;
 				}
 				else if (value.Map != null)
 				{
 					yield return new string[] { name, "Map" };
 
-					foreach (var relay in JsonToKVList(value, name))
+					foreach (var relay in JsonToKVList(value, subTreePath))
 						yield return relay;
 				}
 				else if (value.StringValue != null)
