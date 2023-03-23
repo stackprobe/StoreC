@@ -138,5 +138,11 @@ namespace Charlotte.Tests
 			}
 			Console.WriteLine(string.Join(" and ", ranges.Select(v => string.Format("from 0x{0:x2} to 0x{1:x2}", v[0], v[1]))));
 		}
+
+		public void Test06()
+		{
+			//SCommon.Batch(new string[] { "TIMEOUT 15" });
+			SCommon.Batch(new string[] { "START *Error_123_" });
+		}
 	}
 }
