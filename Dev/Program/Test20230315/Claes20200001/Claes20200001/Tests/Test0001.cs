@@ -83,19 +83,19 @@ namespace Charlotte.Tests
 
 		public void Test04()
 		{
-			Test03_a("AAAABCCCC", 'B', 4);
-			Test03_a("AAAAAAAB", 'B', 7);
-			Test03_a("BCCCCCC", 'B', 0);
-			Test03_a("AAACCC", 'B', -1);
-			Test03_a("AABCC", 'B', 2);
-			Test03_a("CCCC", 'B', -1);
-			Test03_a("AAA", 'B', -1);
-			Test03_a("AB", 'B', 1);
-			Test03_a("B", 'B', 0);
-			Test03_a("", 'B', -1);
+			Test04_a("AAAABCCCC", 'B', 4);
+			Test04_a("AAAAAAAB", 'B', 7);
+			Test04_a("BCCCCCC", 'B', 0);
+			Test04_a("AAACCC", 'B', -1);
+			Test04_a("AABCC", 'B', 2);
+			Test04_a("CCCC", 'B', -1);
+			Test04_a("AAA", 'B', -1);
+			Test04_a("AB", 'B', 1);
+			Test04_a("B", 'B', 0);
+			Test04_a("", 'B', -1);
 		}
 
-		private void Test03_a(string str, char target, int expect)
+		private void Test04_a(string str, char target, int expect)
 		{
 			int ret = SCommon.GetIndex(str.ToCharArray(), target, (a, b) => (int)a - (int)b);
 
@@ -126,7 +126,7 @@ namespace Charlotte.Tests
 
 			for (int c = 0; c < 100; c++) // rough limit
 			{
-				for (int index = ranges.Length - 2; 0 <= index; index--)
+				for (int index = 0; index + 1 < ranges.Length; index += 2)
 				{
 					if (ranges[index][1] + 1 == ranges[index + 1][0])
 					{
