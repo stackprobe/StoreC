@@ -106,5 +106,37 @@ namespace Charlotte.Tests
 
 			Console.WriteLine("OK");
 		}
+
+		public void Test05()
+		{
+			Console.WriteLine(SCommon.ASCII);
+			Console.WriteLine(SCommon.KANA);
+			Console.WriteLine(SCommon.HALF);
+
+			// ----
+
+			ShowRange(SCommon.ENCODING_SJIS.GetBytes(SCommon.ASCII));
+			ShowRange(SCommon.ENCODING_SJIS.GetBytes(SCommon.KANA));
+			ShowRange(SCommon.ENCODING_SJIS.GetBytes(SCommon.HALF));
+		}
+
+		private void ShowRange(byte[] data)
+		{
+			int[][] ranges = data.Select(v => new int[] { (int)v, (int)v }).ToArray();
+
+			for (int c = 0; c < 100; c++) // rough limit
+			{
+				for (int index = ranges.Length - 2; 0 <= index; index--)
+				{
+					if (ranges[index][1] + 1 == ranges[index + 1][0])
+					{
+						ranges[index][1] = ranges[index + 1][1];
+						ranges[index + 1] = null;
+					}
+				}
+				ranges = ranges.Where(v => v != null).ToArray();
+			}
+			Console.WriteLine(string.Join(" and ", ranges.Select(v => string.Format("from 0x{0:x2} to 0x{1:x2}", v[0], v[1]))));
+		}
 	}
 }
