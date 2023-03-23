@@ -2534,6 +2534,64 @@ namespace Charlotte.Commons
 		}
 
 		/// <summary>
+		/// リスト内の特定の位置をバイナリサーチによって取得する。
+		/// ★注意：指定されたリストを自動的にソートしない。
+		/// 比較メソッド：
+		/// -- 少なくとも以下のとおりの比較結果となること。
+		/// ---- 目的位置の左側の要素 &lt; 目的位置の要素
+		/// ---- 目的位置の左側の要素 &lt; 目的位置の右側の要素
+		/// ---- 目的位置の要素 == 目的位置の要素
+		/// ---- 目的位置の要素 &lt; 目的位置の右側の要素
+		/// </summary>
+		/// <typeparam name="T">要素の型</typeparam>
+		/// <param name="list">検索対象のリスト</param>
+		/// <param name="targetValue">範囲内の値</param>
+		/// <param name="comp">比較メソッド</param>
+		/// <returns>目的位置(見つからない場合(-1))</returns>
+		public static int GetIndex<T>(IList<T> list, T targetValue, Comparison<T> comp)
+		{
+			return GetIndex(list, element => comp(element, targetValue));
+		}
+
+		/// <summary>
+		/// リスト内の特定の位置をバイナリサーチによって取得する。
+		/// ★注意：指定されたリストを自動的にソートしない。
+		/// 判定メソッド：
+		/// -- 目的位置の左側の要素であれば負の値を返す。
+		/// -- 目的位置の右側の要素であれば正の値を返す。
+		/// -- 目的位置の要素であれば 0 を返す。
+		/// </summary>
+		/// <typeparam name="T">要素の型</typeparam>
+		/// <param name="list">検索対象のリスト</param>
+		/// <param name="comp">判定メソッド</param>
+		/// <returns>目的位置(見つからない場合(-1))</returns>
+		public static int GetIndex<T>(IList<T> list, Func<T, int> comp)
+		{
+			int l = -1;
+			int r = list.Count;
+
+			while (l + 1 < r)
+			{
+				int m = (l + r) / 2;
+				int ret = comp(list[m]);
+
+				if (ret < 0)
+				{
+					l = m;
+				}
+				else if (0 < ret)
+				{
+					r = m;
+				}
+				else
+				{
+					return m;
+				}
+			}
+			return -1; // not found
+		}
+
+		/// <summary>
 		/// リスト内の範囲(開始位置と終了位置)を取得する。
 		/// 戻り値を range とすると
 		/// for (int index = range[0] + 1; index &lt; range[1]; index++) { T element = list[index]; ... }
