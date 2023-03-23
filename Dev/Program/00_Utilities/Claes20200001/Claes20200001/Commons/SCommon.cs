@@ -1925,7 +1925,7 @@ namespace Charlotte.Commons
 
 				File.WriteAllLines(batFile, commands, ENCODING_SJIS);
 
-				StartProcess("cmd", "/c " + batFile, workingDir, winStyle).WaitForExit();
+				StartProcess("cmd", "/c \"" + batFile + "\"", workingDir, winStyle).WaitForExit();
 			}
 		}
 
