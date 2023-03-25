@@ -49,6 +49,9 @@ namespace Charlotte.GUICommons
 
 		private static void KeepSingleInstance(Action routine)
 		{
+			// HACK: 別々のプログラムが偶然同じビルド時刻になってまうとまずい。
+			// -- それらは同時に実行できなくなる。
+
 			uint peTimeDateStamp = GetPETimeDateStamp(ProcMain.SelfFile);
 
 			Mutex procMutex = new Mutex(
@@ -76,6 +79,7 @@ namespace Charlotte.GUICommons
 					out createdNew,
 					security
 					);
+				bool globalLockFailed = false;
 
 				if (globalProcMutex.WaitOne(0))
 				{
@@ -83,10 +87,26 @@ namespace Charlotte.GUICommons
 
 					globalProcMutex.ReleaseMutex();
 				}
+				else
+				{
+					globalLockFailed = true;
+				}
 				globalProcMutex.Close();
 				globalProcMutex.Dispose();
 				globalProcMutex = null;
 
+				if (globalLockFailed)
+				{
+					// NOTE: ここで(ローカル側ロック解除前に)表示すること。
+					// -- プロセスを同時に複数起動したとき、このダイアログを複数表示させないため。
+					//
+					MessageBox.Show(
+						"Already started on the other logon session !",
+						Path.GetFileNameWithoutExtension(ProcMain.SelfFile) + " / Error",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error
+						);
+				}
 				procMutex.ReleaseMutex();
 			}
 			procMutex.Close();
