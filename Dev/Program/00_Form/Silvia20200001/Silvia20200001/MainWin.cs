@@ -24,10 +24,5 @@ namespace Charlotte
 		{
 			// none
 		}
-
-		private void MainWin_Shown(object sender, EventArgs e)
-		{
-			PostShown.Perform(this);
-		}
 	}
 }

@@ -42,7 +42,6 @@
 			this.Name = "MainWin";
 			this.Text = "Silvia20200001";
 			this.Load += new System.EventHandler(this.MainWin_Load);
-			this.Shown += new System.EventHandler(this.MainWin_Shown);
 			this.ResumeLayout(false);
 
 		}
