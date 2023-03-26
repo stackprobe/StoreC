@@ -79,14 +79,21 @@ namespace Charlotte.GUICommons
 					out createdNew,
 					security
 					);
+				bool globalLockSuccessful = false;
 
 				if (globalProcMutex.WaitOne(0))
 				{
+					globalLockSuccessful = true;
+
 					routine();
 
 					globalProcMutex.ReleaseMutex();
 				}
-				else
+				globalProcMutex.Close();
+				globalProcMutex.Dispose();
+				globalProcMutex = null;
+
+				if (!globalLockSuccessful)
 				{
 					// memo: ローカル側ロック解除前に表示すること。
 					// -- プロセスを同時に複数起動したとき、このダイアログを複数表示させないため。
@@ -98,10 +105,6 @@ namespace Charlotte.GUICommons
 						MessageBoxIcon.Error
 						);
 				}
-				globalProcMutex.Close();
-				globalProcMutex.Dispose();
-				globalProcMutex = null;
-
 				procMutex.ReleaseMutex();
 			}
 			procMutex.Close();
