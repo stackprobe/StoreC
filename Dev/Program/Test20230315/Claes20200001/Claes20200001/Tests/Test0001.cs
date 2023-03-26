@@ -144,5 +144,32 @@ namespace Charlotte.Tests
 			//SCommon.Batch(new string[] { "TIMEOUT 15" });
 			SCommon.Batch(new string[] { "START *Error_123_" });
 		}
+
+		public void Test07()
+		{
+			const string EXPECT_MBC_DECIMAL = "０１２３４５６７８９";
+			const string EXPECT_MBC_ALPHA_UPPER = "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ";
+			const string EXPECT_MBC_ALPHA_LOWER = "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
+
+			if (EXPECT_MBC_DECIMAL != SCommon.MBC_DECIMAL) throw null;
+			if (EXPECT_MBC_ALPHA_UPPER != SCommon.MBC_ALPHA_UPPER) throw null;
+			if (EXPECT_MBC_ALPHA_LOWER != SCommon.MBC_ALPHA_LOWER) throw null;
+
+			// ----
+
+			if (SCommon.DECIMAL != SCommon.ToAsciiHalf(EXPECT_MBC_DECIMAL)) throw null;
+			if (SCommon.ALPHA_UPPER != SCommon.ToAsciiHalf(EXPECT_MBC_ALPHA_UPPER)) throw null;
+			if (SCommon.ALPHA_LOWER != SCommon.ToAsciiHalf(EXPECT_MBC_ALPHA_LOWER)) throw null;
+
+			// - - -
+
+			if (SCommon.HEXADECIMAL_UPPER != SCommon.ToAsciiHalf(SCommon.MBC_HEXADECIMAL_UPPER)) throw null;
+			if (SCommon.HEXADECIMAL_LOWER != SCommon.ToAsciiHalf(SCommon.MBC_HEXADECIMAL_LOWER)) throw null;
+			if (SCommon.ASCII != SCommon.ToAsciiHalf(SCommon.MBC_ASCII)) throw null;
+
+			// ----
+
+			Console.WriteLine("OK!");
+		}
 	}
 }
