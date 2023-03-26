@@ -79,21 +79,23 @@ namespace Charlotte.GUICommons
 					out createdNew,
 					security
 					);
-				bool globalLockSuccessful = false;
+				bool globalLockFailed = false;
 
 				if (globalProcMutex.WaitOne(0))
 				{
-					globalLockSuccessful = true;
-
 					routine();
 
 					globalProcMutex.ReleaseMutex();
+				}
+				else
+				{
+					globalLockFailed = true;
 				}
 				globalProcMutex.Close();
 				globalProcMutex.Dispose();
 				globalProcMutex = null;
 
-				if (!globalLockSuccessful)
+				if (globalLockFailed)
 				{
 					// memo: ローカル側ロック解除前に表示すること。
 					// -- プロセスを同時に複数起動したとき、このダイアログを複数表示させないため。
