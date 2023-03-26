@@ -97,7 +97,7 @@ namespace Charlotte.GUICommons
 
 				if (globalLockFailed)
 				{
-					// memo: ローカル側ロック解除前に表示すること。
+					// memo: ローカル側ロック(procMutex)解除前に表示すること。
 					// -- プロセスを同時に複数起動したとき、このダイアログを複数表示させないため。
 					//
 					MessageBox.Show(
