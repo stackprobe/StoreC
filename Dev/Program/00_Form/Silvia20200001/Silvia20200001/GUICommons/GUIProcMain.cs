@@ -49,8 +49,8 @@ namespace Charlotte.GUICommons
 
 		private static void KeepSingleInstance(Action routine)
 		{
-			// HACK: 別々のプログラムが偶然同じビルド時刻になってまうとまずい。
-			// -- それらは同時に実行できなくなる。
+			// HACK: 別々のプログラムが偶然同じビルド時刻になってまうと、それらは同時に実行できなくなる。
+			// -- レアケースなので看過する。
 
 			uint peTimeDateStamp = GetPETimeDateStamp(ProcMain.SelfFile);
 
@@ -79,7 +79,6 @@ namespace Charlotte.GUICommons
 					out createdNew,
 					security
 					);
-				bool globalLockFailed = false;
 
 				if (globalProcMutex.WaitOne(0))
 				{
@@ -89,15 +88,7 @@ namespace Charlotte.GUICommons
 				}
 				else
 				{
-					globalLockFailed = true;
-				}
-				globalProcMutex.Close();
-				globalProcMutex.Dispose();
-				globalProcMutex = null;
-
-				if (globalLockFailed)
-				{
-					// NOTE: ここで(ローカル側ロック解除前に)表示すること。
+					// memo: ローカル側ロック解除前に表示すること。
 					// -- プロセスを同時に複数起動したとき、このダイアログを複数表示させないため。
 					//
 					MessageBox.Show(
@@ -107,6 +98,10 @@ namespace Charlotte.GUICommons
 						MessageBoxIcon.Error
 						);
 				}
+				globalProcMutex.Close();
+				globalProcMutex.Dispose();
+				globalProcMutex = null;
+
 				procMutex.ReleaseMutex();
 			}
 			procMutex.Close();
