@@ -79,6 +79,7 @@ namespace Charlotte.GUICommons
 					out createdNew,
 					security
 					);
+
 				bool globalLockFailed = false;
 
 				if (globalProcMutex.WaitOne(0))
