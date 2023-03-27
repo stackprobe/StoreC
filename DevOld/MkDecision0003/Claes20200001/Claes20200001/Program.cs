@@ -77,16 +77,19 @@ namespace Charlotte
 
 			string[] lines = File.ReadAllLines(file, Encoding.ASCII);
 
-			Func<List<string>, string> toCellRow2 = v => SCommon.LinesToText(v).Trim();
+			Action endEntity = () =>
+			{
+				if (entity != null)
+				{
+					row2.Add(SCommon.LinesToText(entity).Trim());
+				}
+			};
 
 			foreach (string line in lines)
 			{
 				if (Regex.IsMatch(line, "^[0-9]{3}$"))
 				{
-					if (entity != null)
-					{
-						row2.Add(toCellRow2(entity));
-					}
+					endEntity();
 					row1.Add("'" + line);
 					entity = new List<string>();
 				}
@@ -95,10 +98,7 @@ namespace Charlotte
 					entity.Add(line);
 				}
 			}
-			if (entity != null)
-			{
-				row2.Add(toCellRow2(entity));
-			}
+			endEntity();
 
 			if (row1.Count != row2.Count)
 				throw null;
