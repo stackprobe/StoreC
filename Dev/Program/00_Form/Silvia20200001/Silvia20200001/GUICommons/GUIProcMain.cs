@@ -24,12 +24,14 @@ namespace Charlotte.GUICommons
 			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler((sender, e) => ErrorTermination(e.ExceptionObject));
 			SystemEvents.SessionEnding += new SessionEndingEventHandler((sender, e) => ProgramTermination());
 
-			KeepSingleInstance(peTimeDateStamp =>
-			{
-				BuiltDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-					.AddSeconds(peTimeDateStamp)
-					.ToLocalTime();
+			uint peTimeDateStamp = GetPETimeDateStamp(ProcMain.SelfFile);
 
+			BuiltDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+				.AddSeconds(peTimeDateStamp)
+				.ToLocalTime();
+
+			KeepSingleInstance(peTimeDateStamp, () =>
+			{
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
 				Application.Run(getMainForm());
@@ -53,12 +55,10 @@ namespace Charlotte.GUICommons
 			Environment.Exit(1);
 		}
 
-		private static void KeepSingleInstance(Action<uint> routine)
+		private static void KeepSingleInstance(uint peTimeDateStamp, Action routine)
 		{
 			// HACK: 別々のプログラムが偶然同じビルド時刻になってまうと、それらは同時に実行できなくなる。
 			// -- レアケースなので看過する。
-
-			uint peTimeDateStamp = GetPETimeDateStamp(ProcMain.SelfFile);
 
 			Mutex procMutex = new Mutex(
 				false,
@@ -90,7 +90,7 @@ namespace Charlotte.GUICommons
 
 				if (globalProcMutex.WaitOne(0))
 				{
-					routine(peTimeDateStamp);
+					routine();
 
 					globalProcMutex.ReleaseMutex();
 				}
