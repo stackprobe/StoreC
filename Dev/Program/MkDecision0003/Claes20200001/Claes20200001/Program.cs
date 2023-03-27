@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using Charlotte.Commons;
 using Charlotte.Tests;
+using Charlotte.Utilities;
 
 namespace Charlotte
 {
@@ -19,51 +20,6 @@ namespace Charlotte
 			ProcMain.CUIMain(new Program().Main2);
 		}
 
-		// 以下様式統一のため用途別に好きな方を使ってね -- ★要削除
-
-#if true // 主にデバッガで実行するテスト用プログラム -- ★不要なら要削除
-		private void Main2(ArgsReader ar)
-		{
-			if (ProcMain.DEBUG)
-			{
-				Main3();
-			}
-			else
-			{
-				Main4();
-			}
-			SCommon.OpenOutputDirIfCreated();
-		}
-
-		private void Main3()
-		{
-			Main4();
-			SCommon.Pause();
-		}
-
-		private void Main4()
-		{
-			try
-			{
-				Main5();
-			}
-			catch (Exception ex)
-			{
-				ProcMain.WriteLog(ex);
-			}
-		}
-
-		private void Main5()
-		{
-			// -- choose one --
-
-			new Test0001().Test01();
-			//new Test0002().Test01();
-			//new Test0003().Test01();
-
-			// --
-		}
-#else // 主に実行ファイルにして使う/コマンド引数有り -- ★不要なら要削除
 		private void Main2(ArgsReader ar)
 		{
 			if (ProcMain.DEBUG)
@@ -81,7 +37,7 @@ namespace Charlotte
 		{
 			// -- choose one --
 
-			Main4(new ArgsReader(new string[] { }));
+			Main4(new ArgsReader(new string[] { @"C:\temp\Input.txt", @"C:\temp\Output.csv" }));
 			//new Test0001().Test01();
 			//new Test0002().Test01();
 			//new Test0003().Test01();
@@ -110,8 +66,48 @@ namespace Charlotte
 
 		private void Main5(ArgsReader ar)
 		{
-			// TODO
+			string file = SCommon.MakeFullPath(ar.NextArg());
+			string destFile = SCommon.MakeFullPath(ar.NextArg());
+
+			ar.End();
+
+			List<string> row1 = new List<string>();
+			List<string> row2 = new List<string>();
+			List<string> entity = null;
+
+			string[] lines = File.ReadAllLines(file, Encoding.ASCII);
+
+			Func<List<string>, string> toCellRow2 = v => SCommon.LinesToText(v).Trim();
+
+			foreach (string line in lines)
+			{
+				if (Regex.IsMatch(line, "^[0-9]{3}$"))
+				{
+					if (entity != null)
+					{
+						row2.Add(toCellRow2(entity));
+					}
+					row1.Add("'" + line);
+					entity = new List<string>();
+				}
+				else if (entity != null)
+				{
+					entity.Add(line);
+				}
+			}
+			if (entity != null)
+			{
+				row2.Add(toCellRow2(entity));
+			}
+
+			if (row1.Count != row2.Count)
+				throw null;
+
+			using (CsvFileWriter writer = new CsvFileWriter(destFile))
+			{
+				writer.WriteRow(row1);
+				writer.WriteRow(row2);
+			}
 		}
-#endif
 	}
 }
