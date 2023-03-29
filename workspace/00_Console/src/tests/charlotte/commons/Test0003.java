@@ -19,7 +19,7 @@ public class Test0003 {
 
 	private void test01() throws Exception {
 		String S_TEST_CHRS =
-				SCommon.DECIMAL + SCommon.ALPHA + SCommon.alpha;
+				SCommon.DECIMAL + SCommon.ALPHA_UPPER + SCommon.ALPHA_LOWER;
 
 		List<Character> TEST_CHRS =
 				SCommon.toList(S_TEST_CHRS.toCharArray());

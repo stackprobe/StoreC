@@ -9,7 +9,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -310,21 +314,15 @@ public class SCommon {
 	public static final String CHARSET_SJIS = "MS932";
 	public static final String CHARSET_UTF8 = "UTF-8";
 
-	public static final String BINADECIMAL = "01";
-	public static final String OCTODECIMAL = "012234567";
 	public static final String DECIMAL = "0123456789";
 	public static final String HEXADECIMAL = "0123456789ABCDEF";
 	public static final String hexadecimal = "0123456789abcdef";
 
-	public static final String ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	public static final String alpha = "abcdefghijklmnopqrstuvwxyz";
-	public static final String PUNCT =
-			getStringSJISHalfCodeRange(0x21, 0x2f) +
-			getStringSJISHalfCodeRange(0x3a, 0x40) +
-			getStringSJISHalfCodeRange(0x5b, 0x60) +
-			getStringSJISHalfCodeRange(0x7b, 0x7e);
+	public static final String ALPHA_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static final String ALPHA_LOWER = "abcdefghijklmnopqrstuvwxyz";
 
-	public static final String ASCII = DECIMAL + ALPHA + alpha + PUNCT; // (0x21, 0x7e) -- 空白(0x20)を含まないことに注意
+	public static final String ASCII =
+			getStringSJISHalfCodeRange(0x21, 0x7e); // 空白(0x20)を含まないことに注意
 	public static final String KANA =
 			getStringSJISHalfCodeRange(0xa1, 0xdf);
 
@@ -376,7 +374,7 @@ public class SCommon {
 		int start = 0;
 
 		for (; ; ) {
-			int end = indexOfDelimiters(text, delimiters, start);
+			int end = getIndexByDelimiters(text, delimiters, start);
 
 			if (end == -1) {
 				dest.add(text.substring(start));
@@ -388,7 +386,7 @@ public class SCommon {
 		return dest;
 	}
 
-	public static int indexOfDelimiters(String str, String delimiters, int fromIndex) {
+	private static int getIndexByDelimiters(String str, String delimiters, int fromIndex) {
 		char[] delimiterArray = delimiters.toCharArray();
 
 		for (int index = fromIndex; index < str.length(); index++) {
@@ -401,5 +399,21 @@ public class SCommon {
 			}
 		}
 		return -1;
+	}
+
+	public static <T> Map<String, T> createMap() {
+		return new TreeMap<String, T>((a, b) -> a.compareTo(b));
+	}
+
+	public static <T> Map<String, T> createMapIgnoreCase() {
+		return new TreeMap<String, T>((a, b) -> a.compareToIgnoreCase(b));
+	}
+
+	public static Set<String> createSet() {
+		return new TreeSet<String>((a, b)-> a.compareTo(b));
+	}
+
+	public static Set<String> createSetIgnoreCase() {
+		return new TreeSet<String>((a, b)-> a.compareToIgnoreCase(b));
 	}
 }
