@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Drawing;
 using Charlotte.Commons;
-using System.IO;
 
 namespace Charlotte.Tests
 {
@@ -170,6 +170,68 @@ namespace Charlotte.Tests
 			// ----
 
 			Console.WriteLine("OK!");
+		}
+
+		public void Test08()
+		{
+			List<int[]> ranges = new List<int[]>();
+
+			foreach (char chr in SCommon.GetJChars())
+			{
+				ranges.Add(new int[] { (int)chr, (int)chr });
+			}
+			ranges = ranges.DistinctOrderBy((a, b) => a[0] - b[0]).ToList();
+
+			for (int index = ranges.Count - 2; 0 <= index; index--)
+			{
+				if (ranges[index][1] + 1 == ranges[index + 1][0])
+				{
+					ranges[index][1] = ranges[index + 1][1];
+					ranges[index + 1] = null;
+				}
+			}
+			ranges.RemoveAll(v => v == null);
+
+			Console.WriteLine(string.Join(" and ", ranges.Select(v => string.Format("from 0x{0:x4} to 0x{1:x4}", v[0], v[1]))));
+
+			// ----
+
+			List<string> lines = new List<string>();
+
+			for (int a = 0; a < 256; a++)
+			{
+				StringBuilder buff = new StringBuilder();
+
+				for (int b = 0; b < 256; b++)
+				{
+					int chr = a * 256 + b;
+
+#if true
+					bool flag = SCommon.GetIndex(ranges, range =>
+					{
+						//if (range[0] <= chr && chr <= range[1])
+						//return 0;
+
+						if (chr < range[0])
+							return 1;
+
+						if (range[1] < chr)
+							return -1;
+
+						return 0;
+					})
+					!= -1;
+#elif true
+					bool flag = ranges.Any(v => v[0] <= chr && chr <= v[1]);
+#else
+					bool flag = SCommon.GetJChars().Contains((char)chr);
+#endif
+
+					buff.Append(flag ? '#' : '-');
+				}
+				lines.Add(buff.ToString());
+			}
+			File.WriteAllLines(SCommon.NextOutputPath() + ".txt", lines, Encoding.ASCII);
 		}
 	}
 }
