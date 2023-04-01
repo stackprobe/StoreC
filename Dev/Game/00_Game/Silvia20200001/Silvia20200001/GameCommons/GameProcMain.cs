@@ -75,18 +75,28 @@ namespace Charlotte.GameCommons
 
 		private static void Main3()
 		{
-			string logSaveDir = ProcMain.DEBUG ?
-				@"C:\temp" :
-				new WorkingDir().GetPath(".");
+			string logSaveDir;
+			int logValidFlag;
 
-			ProcMain.WriteLog = message =>
+			if (ProcMain.DEBUG)
 			{
-				File.AppendAllLines(
-					Path.Combine(logSaveDir, "Game.log"),
-					new string[] { "[" + DateTime.Now + "] " + message },
-					Encoding.UTF8
-					);
-			};
+				logSaveDir = @"C:\temp";
+				logValidFlag = 1;
+
+				string logFile = @"C:\temp\Game.log";
+
+				File.WriteAllBytes(logFile, SCommon.EMPTY_BYTES);
+
+				ProcMain.WriteLog = message =>
+				{
+					File.AppendAllText(logFile, "[" + DateTime.Now + "] " + message + "\r\n", Encoding.UTF8);
+				};
+			}
+			else
+			{
+				logSaveDir = null;
+				logValidFlag = 0;
+			}
 
 			string title =
 				Path.GetFileNameWithoutExtension(ProcMain.SelfFile)
@@ -100,8 +110,10 @@ namespace Charlotte.GameCommons
 				icon = new Icon(mem);
 			}
 
-			DX.SetApplicationLogSaveDirectory(logSaveDir);
-			DX.SetOutApplicationLogValidFlag(1); // ログを出力/1:する/0:しない
+			if (logSaveDir != null)
+				DX.SetApplicationLogSaveDirectory(logSaveDir);
+
+			DX.SetOutApplicationLogValidFlag(logValidFlag); // ログを出力/1:する/0:しない
 			DX.SetAlwaysRunFlag(1); // 非アクティブ時に/1:動く/0:止まる
 			DX.SetMainWindowText(title);
 			DX.SetGraphMode(800, 600, 32);
@@ -118,7 +130,7 @@ namespace Charlotte.GameCommons
 			});
 
 			DX.SetWindowSizeChangeEnableFlag(0); // ウィンドウの右下をドラッグでサイズ変更/1:する/0:しない
-			DX.SetMouseDispFlag(0); // マウスカーソルを表示/1:する/0:しない
+			DX.SetMouseDispFlag(1); // マウスカーソルを表示/1:する/0:しない
 			DX.SetDrawMode(DX.DX_DRAWMODE_ANISOTROPIC);
 
 			GameStarted();
