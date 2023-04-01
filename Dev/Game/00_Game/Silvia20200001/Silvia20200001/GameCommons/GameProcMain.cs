@@ -12,7 +12,7 @@ using Charlotte.GUICommons;
 
 namespace Charlotte.GameCommons
 {
-	public class GameProcMain
+	public static class GameProcMain
 	{
 		public static List<Action> Finalizers = new List<Action>();
 
