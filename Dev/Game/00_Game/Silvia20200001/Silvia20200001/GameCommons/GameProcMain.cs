@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using DxLibDLL;
 using Charlotte.Commons;
+using Charlotte.GUICommons;
 
 namespace Charlotte.GameCommons
 {
@@ -15,20 +16,26 @@ namespace Charlotte.GameCommons
 	{
 		public static List<Action> Finalizers = new List<Action>();
 
-		public static void GameMain(Form mainForm)
+		private static Action GameStarted;
+
+		public static void GameMain(Form mainForm, Action userGameMain)
 		{
 			Thread th = new Thread(() =>
 			{
 				bool aliving = true;
 
-				Main2(() =>
+				GameStarted = () =>
 				{
 					mainForm.BeginInvoke((MethodInvoker)delegate
 					{
 						if (aliving)
 							mainForm.Visible = false;
 					});
-				});
+
+					userGameMain();
+				};
+
+				Main2();
 
 				mainForm.BeginInvoke((MethodInvoker)delegate
 				{
@@ -40,11 +47,11 @@ namespace Charlotte.GameCommons
 			th.Start();
 		}
 
-		private static void Main2(Action gameStarted)
+		private static void Main2()
 		{
 			try
 			{
-				Main3(gameStarted);
+				Main3();
 			}
 			catch (Exception e)
 			{
@@ -66,16 +73,25 @@ namespace Charlotte.GameCommons
 			}
 		}
 
-		private static void Main3(Action gameStarted)
+		private static void Main3()
 		{
+			string logSaveDir = ProcMain.DEBUG ?
+				@"C:\temp" :
+				new WorkingDir().GetPath(".");
+
 			ProcMain.WriteLog = message =>
 			{
 				File.AppendAllLines(
-					@"C:\temp\Game.log",
+					Path.Combine(logSaveDir, "Game.log"),
 					new string[] { "[" + DateTime.Now + "] " + message },
 					Encoding.UTF8
 					);
 			};
+
+			string title =
+				Path.GetFileNameWithoutExtension(ProcMain.SelfFile)
+				+ " / "
+				+ GUIProcMain.BuiltDateTime.ToString("yyyy-MM-dd-HH-mm-ss");
 
 			Icon icon;
 
@@ -84,30 +100,28 @@ namespace Charlotte.GameCommons
 				icon = new Icon(mem);
 			}
 
-			DX.SetApplicationLogSaveDirectory(@"C:\temp");
+			DX.SetApplicationLogSaveDirectory(logSaveDir);
 			DX.SetOutApplicationLogValidFlag(1); // ログを出力/1:する/0:しない
 			DX.SetAlwaysRunFlag(1); // 非アクティブ時に/1:動く/0:止まる
-			DX.SetMainWindowText("Elsa20230401");
+			DX.SetMainWindowText(title);
 			DX.SetGraphMode(800, 600, 32);
 			DX.ChangeWindowMode(1); // 1:ウィンドウ/0:フルスクリーン
 			DX.SetWindowIconHandle(icon.Handle);
 
 			if (DX.DxLib_Init() != 0) // ? 失敗
-				throw null;
+				throw new Exception("DxLib_Init failed");
 
 			Finalizers.Add(() =>
 			{
 				if (DX.DxLib_End() != 0) // ? 失敗
-					throw null;
+					throw new Exception("DxLib_End failed");
 			});
 
 			DX.SetWindowSizeChangeEnableFlag(0); // ウィンドウの右下をドラッグでサイズ変更/1:する/0:しない
 			DX.SetMouseDispFlag(0); // マウスカーソルを表示/1:する/0:しない
 			DX.SetDrawMode(DX.DX_DRAWMODE_ANISOTROPIC);
 
-			gameStarted();
-
-			Program2.GameMain(); // TODO
+			GameStarted();
 		}
 	}
 }

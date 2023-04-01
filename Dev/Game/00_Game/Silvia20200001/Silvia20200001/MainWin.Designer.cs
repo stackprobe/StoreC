@@ -41,6 +41,7 @@
 			this.Location = new System.Drawing.Point(-400, -400);
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "MainWin";
+			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
 			this.Text = "Elsa20230401";
 			this.Load += new System.EventHandler(this.MainWin_Load);

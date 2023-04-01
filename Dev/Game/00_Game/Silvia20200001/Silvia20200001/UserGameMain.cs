@@ -6,7 +6,7 @@ using Charlotte.GameCommons;
 
 namespace Charlotte
 {
-	public static class Program2
+	public static class UserGameMain
 	{
 		public static void GameMain()
 		{
