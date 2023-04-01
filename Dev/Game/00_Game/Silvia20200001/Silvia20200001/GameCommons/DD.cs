@@ -19,16 +19,16 @@ namespace Charlotte.GameCommons
 		{
 			if (PF_GetResFileData == null)
 			{
-				string clusterFilePath = Path.Combine(ProcMain.SelfDir, "Resource.dat");
+				string clusterFile = Path.Combine(ProcMain.SelfDir, "Resource.dat");
 
-				if (File.Exists(clusterFilePath))
+				if (File.Exists(clusterFile))
 				{
-					ClusterFile clusterFile = new ClusterFile(clusterFilePath);
-					PF_GetResFileData = p => clusterFile.GetFileData(p);
+					ResourceCluster rc = new ResourceCluster(clusterFile);
+					PF_GetResFileData = fp => rc.GetFileData(fp);
 				}
 				else
 				{
-					PF_GetResFileData = p => File.ReadAllBytes(Path.Combine(@"..\..\..\..\Resource", p));
+					PF_GetResFileData = fp => File.ReadAllBytes(Path.Combine(@"..\..\..\..\Resource", fp));
 				}
 			}
 			return PF_GetResFileData(filePath);

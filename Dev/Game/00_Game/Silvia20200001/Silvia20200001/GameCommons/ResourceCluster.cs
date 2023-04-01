@@ -7,9 +7,9 @@ using Charlotte.Commons;
 
 namespace Charlotte.GameCommons
 {
-	public class ClusterFile
+	public class ResourceCluster
 	{
-		private string ClusterFilePath;
+		private string FilePath;
 
 		private class ElementFileInfo
 		{
@@ -20,11 +20,11 @@ namespace Charlotte.GameCommons
 
 		private List<ElementFileInfo> ElementFiles = new List<ElementFileInfo>();
 
-		public ClusterFile(string filePath)
+		public ResourceCluster(string filePath)
 		{
-			this.ClusterFilePath = filePath;
+			this.FilePath = filePath;
 
-			using (FileStream reader = new FileStream(this.ClusterFilePath, FileMode.Open, FileAccess.Read))
+			using (FileStream reader = new FileStream(this.FilePath, FileMode.Open, FileAccess.Read))
 			{
 				long length = reader.Length;
 
@@ -55,7 +55,7 @@ namespace Charlotte.GameCommons
 			ElementFileInfo elementFile = this.ElementFiles[index];
 			byte[] fileData;
 
-			using (FileStream reader = new FileStream(this.ClusterFilePath, FileMode.Open, FileAccess.Read))
+			using (FileStream reader = new FileStream(this.FilePath, FileMode.Open, FileAccess.Read))
 			{
 				reader.Seek(elementFile.StartPosition, SeekOrigin.Begin);
 				fileData = SCommon.Read(reader, elementFile.Length);
