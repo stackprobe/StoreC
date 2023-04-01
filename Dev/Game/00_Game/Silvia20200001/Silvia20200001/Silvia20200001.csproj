@@ -39,6 +39,9 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DxLibDotNet">
+      <HintPath>C:\Berry\Dat\DxLibDotNet\DxLibDotNet3_24b\DxLibDotNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,6 +62,8 @@
     <Compile Include="Commons\WorkingDir.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="GameCommons\DD.cs" />
+    <Compile Include="GameCommons\GameProcMain.cs" />
     <Compile Include="Ground.cs" />
     <Compile Include="GUICommons\GUIProcMain.cs" />
     <Compile Include="MainWin.cs">
@@ -68,6 +73,7 @@
       <DependentUpon>MainWin.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Program2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainWin.resx">
       <DependentUpon>MainWin.cs</DependentUpon>
@@ -97,6 +103,9 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>COPY C:\Berry\Dat\DxLibDotNet\DxLibDotNet3_24b\DxLib.dll $(TargetDir).</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -38,10 +38,13 @@
 			this.ClientSize = new System.Drawing.Size(284, 261);
 			this.Font = new System.Drawing.Font("メイリオ", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Location = new System.Drawing.Point(-400, -400);
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "MainWin";
-			this.Text = "Silvia20200001";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+			this.Text = "Elsa20230401";
 			this.Load += new System.EventHandler(this.MainWin_Load);
+			this.Shown += new System.EventHandler(this.MainWin_Shown);
 			this.ResumeLayout(false);
 
 		}
