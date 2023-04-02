@@ -76,24 +76,25 @@ namespace Charlotte.GameCommons
 		private static void Main3()
 		{
 			string logSaveDir;
+			string logFile;
 
 			if (ProcMain.DEBUG)
 			{
 				logSaveDir = @"C:\temp";
-
-				string logFile = @"C:\temp\Game.log";
-
-				File.WriteAllBytes(logFile, SCommon.EMPTY_BYTES);
-
-				ProcMain.WriteLog = message =>
-				{
-					File.AppendAllText(logFile, "[" + DateTime.Now + "] " + message + "\r\n", Encoding.UTF8);
-				};
+				logFile = @"C:\temp\Game.log";
 			}
 			else
 			{
 				logSaveDir = new WorkingDir().GetPath(".");
+				logFile = Path.Combine(ProcMain.SelfDir, "Game.log");
 			}
+
+			File.WriteAllBytes(logFile, SCommon.EMPTY_BYTES);
+
+			ProcMain.WriteLog = message =>
+			{
+				File.AppendAllText(logFile, "[" + DateTime.Now + "] " + message + "\r\n", Encoding.UTF8);
+			};
 
 			string title =
 				Path.GetFileNameWithoutExtension(ProcMain.SelfFile)
