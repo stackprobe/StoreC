@@ -94,17 +94,33 @@ namespace Charlotte
 					Console.WriteLine("S " + data.Length);
 
 					data = SCommon.Compress(data);
-					LiteMaskP6(data);
-					LiteShuffleP9(data);
+					LiteShuffleMix(data);
 
 					SCommon.WritePartString(writer, resPath);
 					SCommon.WritePartInt(writer, data.Length);
-					SCommon.WritePart(writer, data);
+					SCommon.Write(writer, data);
 
 					Console.WriteLine("done");
 				}
 			}
 			Console.WriteLine("done!");
+		}
+
+		private static void LiteShuffleMix(byte[] data)
+		{
+			LiteMaskP6P2(data);
+			LiteShuffleP9(data);
+			LiteMaskP6P2(data);
+		}
+
+		private static void LiteMaskP6P2(byte[] data)
+		{
+			int count = Math.Min(13, data.Length / 3);
+
+			for (int index = 0; index < count; index++)
+			{
+				data[index] ^= 0xa5;
+			}
 		}
 
 		private static void LiteShuffleP9(byte[] data)
@@ -119,16 +135,6 @@ namespace Charlotte
 
 				l++;
 				r -= rr;
-			}
-		}
-
-		private static void LiteMaskP6(byte[] data)
-		{
-			int count = Math.Min(13, data.Length);
-
-			for (int index = 0; index < count; index++)
-			{
-				data[index] ^= 0xa5;
 			}
 		}
 	}

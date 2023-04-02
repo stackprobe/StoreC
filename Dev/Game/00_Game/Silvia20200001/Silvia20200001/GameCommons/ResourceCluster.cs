@@ -61,11 +61,27 @@ namespace Charlotte.GameCommons
 				data = SCommon.Read(reader, elementFile.Length);
 			}
 
-			LiteShuffleP9(data);
-			LiteMaskP6(data);
+			LiteShuffleMix(data);
 			data = SCommon.Decompress(data);
 
 			return data;
+		}
+
+		private static void LiteShuffleMix(byte[] data)
+		{
+			LiteMaskP6P2(data);
+			LiteShuffleP9(data);
+			LiteMaskP6P2(data);
+		}
+
+		private static void LiteMaskP6P2(byte[] data)
+		{
+			int count = Math.Min(13, data.Length / 3);
+
+			for (int index = 0; index < count; index++)
+			{
+				data[index] ^= 0xa5;
+			}
 		}
 
 		private static void LiteShuffleP9(byte[] data)
@@ -80,16 +96,6 @@ namespace Charlotte.GameCommons
 
 				l++;
 				r -= rr;
-			}
-		}
-
-		private static void LiteMaskP6(byte[] data)
-		{
-			int count = Math.Min(13, data.Length);
-
-			for (int index = 0; index < count; index++)
-			{
-				data[index] ^= 0xa5;
 			}
 		}
 	}
