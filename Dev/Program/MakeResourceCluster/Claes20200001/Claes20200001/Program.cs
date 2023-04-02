@@ -19,51 +19,6 @@ namespace Charlotte
 			ProcMain.CUIMain(new Program().Main2);
 		}
 
-		// 以下様式統一のため用途別に好きな方を使ってね -- ★要削除
-
-#if true // 主にデバッガで実行するテスト用プログラム -- ★不要なら要削除
-		private void Main2(ArgsReader ar)
-		{
-			if (ProcMain.DEBUG)
-			{
-				Main3();
-			}
-			else
-			{
-				Main4();
-			}
-			SCommon.OpenOutputDirIfCreated();
-		}
-
-		private void Main3()
-		{
-			Main4();
-			SCommon.Pause();
-		}
-
-		private void Main4()
-		{
-			try
-			{
-				Main5();
-			}
-			catch (Exception ex)
-			{
-				ProcMain.WriteLog(ex);
-			}
-		}
-
-		private void Main5()
-		{
-			// -- choose one --
-
-			new Test0001().Test01();
-			//new Test0002().Test01();
-			//new Test0003().Test01();
-
-			// --
-		}
-#else // 主に実行ファイルにして使う/コマンド引数有り -- ★不要なら要削除
 		private void Main2(ArgsReader ar)
 		{
 			if (ProcMain.DEBUG)
@@ -81,7 +36,7 @@ namespace Charlotte
 		{
 			// -- choose one --
 
-			Main4(new ArgsReader(new string[] { }));
+			Main4(new ArgsReader(new string[] { @"C:\temp\Input", @"C:\temp\Output.dat" }));
 			//new Test0001().Test01();
 			//new Test0002().Test01();
 			//new Test0003().Test01();
@@ -101,7 +56,7 @@ namespace Charlotte
 			{
 				ProcMain.WriteLog(ex);
 
-				//MessageBox.Show("" + ex, Path.GetFileNameWithoutExtension(ProcMain.SelfFile) + " / エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show("" + ex, Path.GetFileNameWithoutExtension(ProcMain.SelfFile) + " / エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
 				//Console.WriteLine("Press ENTER key. (エラーによりプログラムを終了します)");
 				//Console.ReadLine();
@@ -110,8 +65,71 @@ namespace Charlotte
 
 		private void Main5(ArgsReader ar)
 		{
-			// TODO
+			string resourceDir = SCommon.MakeFullPath(ar.NextArg());
+			string clusterFile = SCommon.MakeFullPath(ar.NextArg());
+
+			ar.End();
+
+			Console.WriteLine("< " + resourceDir);
+			Console.WriteLine("> " + clusterFile);
+
+			if (!Directory.Exists(resourceDir))
+				throw new Exception("no resourceDir");
+
+			if (Directory.Exists(clusterFile))
+				throw new Exception("Bad clusterFile");
+
+			using (FileStream writer = new FileStream(clusterFile, FileMode.Create, FileAccess.Write))
+			{
+				string[] files = Directory.GetFiles(resourceDir, "*", SearchOption.AllDirectories);
+
+				Array.Sort(files, SCommon.CompIgnoreCase);
+
+				foreach (string file in files)
+				{
+					string resPath = SCommon.ChangeRoot(file, resourceDir);
+					byte[] data = File.ReadAllBytes(file);
+
+					Console.WriteLine("+ " + resPath);
+					Console.WriteLine("S " + data.Length);
+
+					data = SCommon.Compress(data);
+					LiteMaskP6(data);
+					LiteShuffleP9(data);
+
+					SCommon.WritePartString(writer, resPath);
+					SCommon.WritePartInt(writer, data.Length);
+					SCommon.WritePart(writer, data);
+
+					Console.WriteLine("done");
+				}
+			}
+			Console.WriteLine("done!");
 		}
-#endif
+
+		private static void LiteShuffleP9(byte[] data)
+		{
+			int l = 0;
+			int r = data.Length - 1;
+			int rr = Math.Max(1, data.Length / 23);
+
+			while (l < r)
+			{
+				SCommon.Swap(data, l, r);
+
+				l++;
+				r -= rr;
+			}
+		}
+
+		private static void LiteMaskP6(byte[] data)
+		{
+			int count = Math.Min(13, data.Length);
+
+			for (int index = 0; index < count; index++)
+			{
+				data[index] ^= 0xa5;
+			}
+		}
 	}
 }

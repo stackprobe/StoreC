@@ -47,7 +47,7 @@ namespace Charlotte.GameCommons
 
 		public byte[] GetData(string resPath)
 		{
-			int index = SCommon.GetIndex(this.ElementFiles, v => SCommon.Comp(v.ResPath, resPath));
+			int index = SCommon.GetIndex(this.ElementFiles, v => SCommon.CompIgnoreCase(v.ResPath, resPath));
 
 			if (index == -1)
 				throw new Exception("resPath: " + resPath);
