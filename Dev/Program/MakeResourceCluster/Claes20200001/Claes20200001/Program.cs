@@ -83,6 +83,8 @@ namespace Charlotte
 			{
 				string[] files = Directory.GetFiles(resourceDir, "*", SearchOption.AllDirectories);
 
+				files = files.Where(v => !Path.GetFileName(v).StartsWith("_")).ToArray(); // 半角アンダースコア('_')で始まるファイルは除外する。
+
 				Array.Sort(files, SCommon.CompIgnoreCase);
 
 				foreach (string file in files)
@@ -94,7 +96,7 @@ namespace Charlotte
 					Console.WriteLine("S " + data.Length);
 
 					data = SCommon.Compress(data);
-					LiteShuffleMix(data);
+					LiteShuffleP29(data);
 
 					SCommon.WritePartString(writer, resPath);
 					SCommon.WritePartInt(writer, data.Length);
@@ -106,28 +108,11 @@ namespace Charlotte
 			Console.WriteLine("done!");
 		}
 
-		private static void LiteShuffleMix(byte[] data)
-		{
-			LiteMaskP6P2(data);
-			LiteShuffleP9(data);
-			LiteMaskP6P2(data);
-		}
-
-		private static void LiteMaskP6P2(byte[] data)
-		{
-			int count = Math.Min(13, data.Length / 3);
-
-			for (int index = 0; index < count; index++)
-			{
-				data[index] ^= 0xa5;
-			}
-		}
-
-		private static void LiteShuffleP9(byte[] data)
+		private static void LiteShuffleP29(byte[] data)
 		{
 			int l = 0;
-			int r = data.Length - 1;
-			int rr = Math.Max(1, data.Length / 23);
+			int r = data.Length - 2;
+			int rr = Math.Max(3, data.Length / 109);
 
 			while (l < r)
 			{
