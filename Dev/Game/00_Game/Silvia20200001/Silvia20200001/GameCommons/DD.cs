@@ -13,25 +13,31 @@ namespace Charlotte.GameCommons
 	/// </summary>
 	public static class DD
 	{
-		private static Func<string, byte[]> PF_GetResFileData = null;
+		private static Func<string, byte[]> ResFileDataGetter = null;
 
-		public static byte[] GetResFileData(string filePath)
+		public static byte[] GetResFileData(string resPath)
 		{
-			if (PF_GetResFileData == null)
-			{
-				string clusterFile = Path.Combine(ProcMain.SelfDir, "Resource.dat");
+			if (ResFileDataGetter == null)
+				ResFileDataGetter = GetResFileDataGetter();
 
-				if (File.Exists(clusterFile))
-				{
-					ResourceCluster rc = new ResourceCluster(clusterFile);
-					PF_GetResFileData = fp => rc.GetFileData(fp);
-				}
-				else
-				{
-					PF_GetResFileData = fp => File.ReadAllBytes(Path.Combine(@"..\..\..\..\Resource", fp));
-				}
+			return ResFileDataGetter(resPath);
+		}
+
+		private static Func<string, byte[]> GetResFileDataGetter()
+		{
+			string clusterFile = Path.Combine(ProcMain.SelfDir, "Resource.dat");
+			Func<string, byte[]> getter;
+
+			if (File.Exists(clusterFile))
+			{
+				ResourceCluster rc = new ResourceCluster(clusterFile);
+				getter = resPath => rc.GetData(resPath);
 			}
-			return PF_GetResFileData(filePath);
+			else
+			{
+				getter = resPath => File.ReadAllBytes(Path.Combine(@"..\..\..\..\Resource", resPath));
+			}
+			return getter;
 		}
 
 		public static void EachFrame()

@@ -76,12 +76,10 @@ namespace Charlotte.GameCommons
 		private static void Main3()
 		{
 			string logSaveDir;
-			int logValidFlag;
 
 			if (ProcMain.DEBUG)
 			{
 				logSaveDir = @"C:\temp";
-				logValidFlag = 1;
 
 				string logFile = @"C:\temp\Game.log";
 
@@ -94,8 +92,7 @@ namespace Charlotte.GameCommons
 			}
 			else
 			{
-				logSaveDir = null;
-				logValidFlag = 0;
+				logSaveDir = new WorkingDir().GetPath(".");
 			}
 
 			string title =
@@ -110,10 +107,8 @@ namespace Charlotte.GameCommons
 				icon = new Icon(mem);
 			}
 
-			if (logSaveDir != null)
-				DX.SetApplicationLogSaveDirectory(logSaveDir);
-
-			DX.SetOutApplicationLogValidFlag(logValidFlag); // ログを出力/1:する/0:しない
+			DX.SetApplicationLogSaveDirectory(logSaveDir);
+			DX.SetOutApplicationLogValidFlag(1); // ログを出力/1:する/0:しない
 			DX.SetAlwaysRunFlag(1); // 非アクティブ時に/1:動く/0:止まる
 			DX.SetMainWindowText(title);
 			DX.SetGraphMode(800, 600, 32);

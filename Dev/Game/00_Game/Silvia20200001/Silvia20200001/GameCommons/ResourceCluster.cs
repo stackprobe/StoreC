@@ -9,62 +9,63 @@ namespace Charlotte.GameCommons
 {
 	public class ResourceCluster
 	{
-		private string FilePath;
+		private string ClusterFile;
 
 		private class ElementFileInfo
 		{
-			public string FilePath;
-			public long StartPosition;
+			public string ResPath;
+			public long StartPos;
 			public int Length;
 		}
 
 		private List<ElementFileInfo> ElementFiles = new List<ElementFileInfo>();
 
-		public ResourceCluster(string filePath)
+		public ResourceCluster(string clusterFile)
 		{
-			this.FilePath = filePath;
+			this.ClusterFile = clusterFile;
 
-			using (FileStream reader = new FileStream(this.FilePath, FileMode.Open, FileAccess.Read))
+			using (FileStream reader = new FileStream(this.ClusterFile, FileMode.Open, FileAccess.Read))
 			{
-				long length = reader.Length;
+				long clusterFileSize = reader.Length;
 
-				while (reader.Position < length)
+				while (reader.Position < clusterFileSize)
 				{
-					string elementFilePath = SCommon.ReadPartString(reader);
-					int elementLength = SCommon.ReadPartInt(reader);
+					string resPath = SCommon.ReadPartString(reader);
+					int length = SCommon.ReadPartInt(reader);
 
 					this.ElementFiles.Add(new ElementFileInfo()
 					{
-						FilePath = elementFilePath,
-						StartPosition = reader.Position,
-						Length = elementLength,
+						ResPath = resPath,
+						StartPos = reader.Position,
+						Length = length,
 					});
 
-					reader.Seek(elementLength, SeekOrigin.Current);
+					reader.Seek(length, SeekOrigin.Current);
 				}
 			}
 		}
 
-		public byte[] GetFileData(string filePath)
+		public byte[] GetData(string resPath)
 		{
-			int index = SCommon.GetIndex(this.ElementFiles, v => SCommon.Comp(v.FilePath, filePath));
+			int index = SCommon.GetIndex(this.ElementFiles, v => SCommon.Comp(v.ResPath, resPath));
 
 			if (index == -1)
-				throw new Exception("不明なファイル：" + filePath);
+				throw new Exception("resPath: " + resPath);
 
 			ElementFileInfo elementFile = this.ElementFiles[index];
-			byte[] fileData;
+			byte[] data;
 
-			using (FileStream reader = new FileStream(this.FilePath, FileMode.Open, FileAccess.Read))
+			using (FileStream reader = new FileStream(this.ClusterFile, FileMode.Open, FileAccess.Read))
 			{
-				reader.Seek(elementFile.StartPosition, SeekOrigin.Begin);
-				fileData = SCommon.Read(reader, elementFile.Length);
+				reader.Seek(elementFile.StartPos, SeekOrigin.Begin);
+				data = SCommon.Read(reader, elementFile.Length);
 			}
 
-			LiteShuffleP9(fileData);
-			fileData = SCommon.Decompress(fileData);
+			LiteShuffleP9(data);
+			LiteMaskP6(data);
+			data = SCommon.Decompress(data);
 
-			return fileData;
+			return data;
 		}
 
 		private static void LiteShuffleP9(byte[] data)
@@ -79,6 +80,16 @@ namespace Charlotte.GameCommons
 
 				l++;
 				r -= rr;
+			}
+		}
+
+		private static void LiteMaskP6(byte[] data)
+		{
+			int count = Math.Min(13, data.Length);
+
+			for (int index = 0; index < count; index++)
+			{
+				data[index] ^= 0xa5;
 			}
 		}
 	}
