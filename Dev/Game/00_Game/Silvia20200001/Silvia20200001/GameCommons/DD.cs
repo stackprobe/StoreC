@@ -42,6 +42,10 @@ namespace Charlotte.GameCommons
 
 		public static void EachFrame()
 		{
+			// TODO
+			// TODO
+			// TODO
+
 			GC.Collect();
 
 			DX.ScreenFlip();
@@ -50,6 +54,14 @@ namespace Charlotte.GameCommons
 			{
 				throw new Exception("ゲーム中断");
 			}
+
+			// TODO
+			// TODO
+			// TODO
 		}
+
+		// TODO
+		// TODO
+		// TODO
 	}
 }

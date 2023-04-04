@@ -10,10 +10,22 @@ namespace Charlotte
 	{
 		public static void GameMain()
 		{
+			// TODO
+			// TODO
+			// TODO
+
 			for (; ; )
 			{
+				// TODO
+				// TODO
+				// TODO
+
 				DD.EachFrame();
 			}
+
+			// TODO
+			// TODO
+			// TODO
 		}
 	}
 }
