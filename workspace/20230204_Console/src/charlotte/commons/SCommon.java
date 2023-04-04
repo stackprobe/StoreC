@@ -304,7 +304,7 @@ public class SCommon {
 				GZIPInputStream reader = new GZIPInputStream(mem);
 				ByteArrayOutputStream writer = new ByteArrayOutputStream()
 				) {
-			byte[] buff = new byte[2 * 1024 * 1024];
+			byte[] buff = new byte[16 * 1024];
 
 			for (; ; ) {
 				int size = reader.read(buff);
