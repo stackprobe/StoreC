@@ -68,7 +68,7 @@ public class RandomUnit {
 	}
 
 	/**
-	 * 真偽値を返す。
+	 * 真偽値をランダムに返す。
 	 * @return 真偽値
 	 */
 	public boolean getBoolean() {
